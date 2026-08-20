@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Builds
+dist/
+build/
+out/
+*.exe
+*.dll
+*.obj
+*.o
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
+.DS_Store
