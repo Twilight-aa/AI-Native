@@ -49,9 +49,31 @@ export interface RouteSelection {
   birdId: string;
 }
 
+export interface MaterialData {
+  id: string;
+  name: string;
+  waterproof: number;
+  shockproof: number;
+  lightproof: number;
+  breathability: number;
+  weight: number;
+  slot: "container" | "outer" | "filling";
+}
+
+export interface PackingResult {
+  materialIds: string[];
+  waterproof: number;
+  shockproof: number;
+  lightproof: number;
+  breathability: number;
+  totalWeight: number;
+  issues: string[];
+}
+
 export interface DeliveryResult {
   safe: boolean;
   onTime: boolean;
   clever: boolean;
+  success: boolean;
   failReasons: string[];
 }
