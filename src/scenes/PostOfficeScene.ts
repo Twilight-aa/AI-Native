@@ -21,96 +21,80 @@ export class PostOfficeScene extends Phaser.Scene {
     const order = level.orders[0];
     this.selectedMaterials = new Set();
 
-    this.add.text(640, 50, "邮局 — 包装阶段", {
+    this.add.text(640, 40, "邮局 — 包装阶段", {
       fontSize: "36px", color: "#5c4a32", fontFamily: "serif",
     }).setOrigin(0.5);
 
-    this.add.rectangle(640, 130, 500, 70, 0xf5eed6).setStrokeStyle(2, 0x8b7355);
-    this.add.text(640, 130, `📦 ${order.goods}  →  ${order.recipient}`, {
+    this.add.rectangle(640, 110, 500, 70, 0xf5eed6).setStrokeStyle(2, 0x8b7355);
+    this.add.text(640, 100, `📦 ${order.goods}  →  ${order.recipient}`, {
       fontSize: "22px", color: "#5c4a32", fontFamily: "serif",
     }).setOrigin(0.5);
-
-    this.add.text(640, 170, order.traits.map((t) => `⚠ ${t}`).join("   "), {
-      fontSize: "16px", color: "#c0392b", fontFamily: "serif", align: "center",
-      wordWrap: { width: 560 },
+    this.add.text(640, 130, `目的地：${order.destination}  |  时限：${order.deadline}`, {
+      fontSize: "14px", color: "#8b7355", fontFamily: "serif",
     }).setOrigin(0.5);
+
+    order.traits.forEach((t, i) => {
+      this.add.text(640, 165 + i * 22, `⚠ 特性：${t}`, {
+        fontSize: "16px", color: "#c0392b", fontFamily: "serif",
+      }).setOrigin(0.5);
+    });
 
     this.add.text(640, 230, "选择包装材料：", {
       fontSize: "20px", color: "#5c4a32", fontFamily: "serif",
     }).setOrigin(0.5);
 
     const materialIds = level.availableMaterials;
-    const cardBackgrounds = new Map<string, Phaser.GameObjects.Rectangle>();
-    const columnCount = Math.min(materialIds.length, 4);
-    const spacingX = 280;
-    const startX = 640 - ((columnCount - 1) * spacingX) / 2;
+    const cols = 4;
+    const spacingX = 240;
+    const startX = 640 - ((Math.min(materialIds.length, cols) - 1) * spacingX) / 2;
+    const cellY = 360;
 
     materialIds.forEach((id, i) => {
       const mat = MATERIALS[id];
-      const column = i % columnCount;
-      const row = Math.floor(i / columnCount);
-      const x = startX + column * spacingX;
-      const y = 350 + row * 180;
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = startX + col * spacingX;
+      const y = cellY + row * 200;
 
       const card = this.add.container(x, y);
 
-      const bg = this.add.rectangle(0, 0, 260, 160, 0xf5eed6)
+      const bg = this.add.rectangle(0, 0, 200, 150, 0xf5eed6)
         .setStrokeStyle(2, 0x8b7355)
         .setInteractive({ useHandCursor: true });
 
       const nameText = this.add.text(0, -50, mat.name, {
-        fontSize: "24px", color: "#5c4a32", fontFamily: "serif",
+        fontSize: "22px", color: "#5c4a32", fontFamily: "serif",
       }).setOrigin(0.5);
 
       const props = this.add.text(0, 10, this.formatProps(mat), {
-        fontSize: "14px", color: "#8b7355", fontFamily: "serif", align: "center",
+        fontSize: "13px", color: "#8b7355", fontFamily: "serif", align: "center",
       }).setOrigin(0.5);
 
       card.add([bg, nameText, props]);
       this.add.existing(card);
-      cardBackgrounds.set(id, bg);
 
       bg.on("pointerdown", () => {
         if (this.selectedMaterials.has(id)) {
           this.selectedMaterials.delete(id);
           bg.setFillStyle(0xf5eed6);
           bg.setStrokeStyle(2, 0x8b7355);
-          return;
+        } else {
+          this.selectedMaterials.add(id);
+          bg.setFillStyle(0xd4e6c3);
+          bg.setStrokeStyle(3, 0x27ae60);
         }
-
-        for (const selectedId of this.selectedMaterials) {
-          if (MATERIALS[selectedId]?.slot === mat.slot) {
-            this.selectedMaterials.delete(selectedId);
-            cardBackgrounds.get(selectedId)
-              ?.setFillStyle(0xf5eed6)
-              .setStrokeStyle(2, 0x8b7355);
-          }
-        }
-
-        this.selectedMaterials.add(id);
-        bg.setFillStyle(0xd4e6c3);
-        bg.setStrokeStyle(3, 0x27ae60);
       });
     });
 
-    const validationText = this.add.text(640, 505, "", {
-      fontSize: "16px", color: "#c0392b", fontFamily: "serif",
-    }).setOrigin(0.5);
-
-    new Button(this, 640, 540, "确认发件", () => {
-      const hasContainer = Array.from(this.selectedMaterials)
-        .some((id) => MATERIALS[id]?.slot === "container");
-      if (!hasContainer) {
-        validationText.setText("请先选择一个容器");
-        return;
-      }
+    new Button(this, 640, 560, "确认发件", () => {
+      if (this.selectedMaterials.size === 0) return;
       this.scene.start("Route", {
         levelId,
         selectedMaterials: Array.from(this.selectedMaterials),
       });
     });
 
-    new Button(this, 640, 630, "返回选关", () => {
+    new Button(this, 640, 640, "返回选关", () => {
       this.scene.start("LevelSelect");
     }, 160, 50);
   }

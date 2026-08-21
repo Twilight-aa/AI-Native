@@ -11,6 +11,16 @@ export const MATERIALS: Record<string, MaterialData> = {
     weight: 1,
     slot: "container",
   },
+  wooden_box: {
+    id: "wooden_box",
+    name: "木箱",
+    waterproof: 2,
+    shockproof: 5,
+    lightproof: 3,
+    breathability: 2,
+    weight: 3,
+    slot: "container",
+  },
   wax_paper: {
     id: "wax_paper",
     name: "蜡纸",
@@ -20,6 +30,16 @@ export const MATERIALS: Record<string, MaterialData> = {
     breathability: 1,
     weight: 0.5,
     slot: "outer",
+  },
+  feather_pad: {
+    id: "feather_pad",
+    name: "羽毛垫",
+    waterproof: 0,
+    shockproof: 3,
+    lightproof: 0,
+    breathability: 4,
+    weight: 1.5,
+    slot: "filling",
   },
 };
 
