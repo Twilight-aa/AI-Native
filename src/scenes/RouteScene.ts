@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { Button } from "../ui/Button";
 import { getLevel } from "../data/levels";
 import { MATERIALS } from "../data/materials";
+import { evaluatePacking } from "../systems/OrderSystem";
 
 export class RouteScene extends Phaser.Scene {
   private selectedRoute: string | null = null;
@@ -41,10 +42,15 @@ export class RouteScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     const routeCards: Phaser.GameObjects.Container[] = [];
+    const columnCount = Math.min(level.routes.length, 3);
+    const spacingX = 420;
+    const startX = 640 - ((columnCount - 1) * spacingX) / 2;
 
     level.routes.forEach((route, i) => {
-      const x = 300 + i * 680;
-      const y = 380;
+      const column = i % columnCount;
+      const row = Math.floor(i / columnCount);
+      const x = startX + column * spacingX;
+      const y = 380 + row * 200;
 
       const card = this.add.container(x, y);
       const bg = this.add.rectangle(0, 0, 300, 180, 0xf5eed6)
@@ -100,16 +106,6 @@ export class RouteScene extends Phaser.Scene {
   }
 
   private getPackingProps(materialIds: string[]): { waterproof: number; shockproof: number; lightproof: number; breathability: number } {
-    let w = 0, s = 0, l = 0, b = 0;
-    for (const id of materialIds) {
-      const m = MATERIALS[id];
-      if (m) {
-        w += m.waterproof;
-        s += m.shockproof;
-        l += m.lightproof;
-        b += m.breathability;
-      }
-    }
-    return { waterproof: w, shockproof: s, lightproof: l, breathability: b };
+    return evaluatePacking([], materialIds);
   }
 }

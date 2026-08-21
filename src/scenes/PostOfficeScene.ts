@@ -30,24 +30,27 @@ export class PostOfficeScene extends Phaser.Scene {
       fontSize: "22px", color: "#5c4a32", fontFamily: "serif",
     }).setOrigin(0.5);
 
-    const traits = order.traits.map((t) =>
-      this.add.text(640, 170, `⚠ 特性：${t}`, {
-        fontSize: "16px", color: "#c0392b", fontFamily: "serif",
-      }).setOrigin(0.5)
-    );
-    traits[0]?.setY(170);
+    this.add.text(640, 170, order.traits.map((t) => `⚠ ${t}`).join("   "), {
+      fontSize: "16px", color: "#c0392b", fontFamily: "serif", align: "center",
+      wordWrap: { width: 560 },
+    }).setOrigin(0.5);
 
     this.add.text(640, 230, "选择包装材料：", {
       fontSize: "20px", color: "#5c4a32", fontFamily: "serif",
     }).setOrigin(0.5);
 
     const materialIds = level.availableMaterials;
-    const cards: Phaser.GameObjects.Container[] = [];
+    const cardBackgrounds = new Map<string, Phaser.GameObjects.Rectangle>();
+    const columnCount = Math.min(materialIds.length, 4);
+    const spacingX = 280;
+    const startX = 640 - ((columnCount - 1) * spacingX) / 2;
 
     materialIds.forEach((id, i) => {
       const mat = MATERIALS[id];
-      const x = 350 + i * 580;
-      const y = 350;
+      const column = i % columnCount;
+      const row = Math.floor(i / columnCount);
+      const x = startX + column * spacingX;
+      const y = 350 + row * 180;
 
       const card = this.add.container(x, y);
 
@@ -65,27 +68,42 @@ export class PostOfficeScene extends Phaser.Scene {
 
       card.add([bg, nameText, props]);
       this.add.existing(card);
-
-      let selected = false;
+      cardBackgrounds.set(id, bg);
 
       bg.on("pointerdown", () => {
-        selected = !selected;
-        if (selected) {
-          this.selectedMaterials.add(id);
-          bg.setFillStyle(0xd4e6c3);
-          bg.setStrokeStyle(3, 0x27ae60);
-        } else {
+        if (this.selectedMaterials.has(id)) {
           this.selectedMaterials.delete(id);
           bg.setFillStyle(0xf5eed6);
           bg.setStrokeStyle(2, 0x8b7355);
+          return;
         }
-      });
 
-      cards.push(card);
+        for (const selectedId of this.selectedMaterials) {
+          if (MATERIALS[selectedId]?.slot === mat.slot) {
+            this.selectedMaterials.delete(selectedId);
+            cardBackgrounds.get(selectedId)
+              ?.setFillStyle(0xf5eed6)
+              .setStrokeStyle(2, 0x8b7355);
+          }
+        }
+
+        this.selectedMaterials.add(id);
+        bg.setFillStyle(0xd4e6c3);
+        bg.setStrokeStyle(3, 0x27ae60);
+      });
     });
 
+    const validationText = this.add.text(640, 505, "", {
+      fontSize: "16px", color: "#c0392b", fontFamily: "serif",
+    }).setOrigin(0.5);
+
     new Button(this, 640, 540, "确认发件", () => {
-      if (this.selectedMaterials.size === 0) return;
+      const hasContainer = Array.from(this.selectedMaterials)
+        .some((id) => MATERIALS[id]?.slot === "container");
+      if (!hasContainer) {
+        validationText.setText("请先选择一个容器");
+        return;
+      }
       this.scene.start("Route", {
         levelId,
         selectedMaterials: Array.from(this.selectedMaterials),

@@ -53,13 +53,11 @@ export class ResultScene extends Phaser.Scene {
       }).setOrigin(0.5);
     }
 
-    const stars = [];
-    if (result.safe) stars.push("安全星 ✓");
-    else stars.push("安全星 ✗");
-    if (result.onTime) stars.push("准时星 ✓");
-    else stars.push("准时星 ✗");
-    if (result.clever) stars.push("巧思星 ✓");
-    else stars.push("巧思星 ✗");
+    const stars = [
+      this.formatStar("安全星", level.starConditions.safe, result.safe),
+      this.formatStar("准时星", level.starConditions.onTime, result.onTime),
+      this.formatStar("巧思星", level.starConditions.clever, result.clever),
+    ];
 
     this.add.text(640, 280, stars.join("   "), {
       fontSize: "18px", color: "#5c4a32", fontFamily: "serif",
@@ -85,5 +83,10 @@ export class ResultScene extends Phaser.Scene {
     new Button(this, 800, 540, "返回选关", () => {
       this.scene.start("LevelSelect");
     });
+  }
+
+  private formatStar(label: string, enabled: boolean, earned: boolean): string {
+    if (!enabled) return `${label} —`;
+    return `${label} ${earned ? "✓" : "✗"}`;
   }
 }
