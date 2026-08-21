@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { Button } from "../ui/Button";
-import { getLevel } from "../data/levels";
+import { getLevel, LEVELS } from "../data/levels";
 import { MATERIALS } from "../data/materials";
 import { evaluateDelivery } from "../systems/OrderSystem";
 
@@ -28,7 +28,9 @@ export class ResultScene extends Phaser.Scene {
 
     const result = evaluateDelivery(
       order.traits,
-      selectedMaterials,
+      selectedMaterials[0] || null,
+      selectedMaterials[1] || null,
+      selectedMaterials[2] || null,
       route?.hazards || [],
       route?.distance || 0,
       bird?.speed || 10,
@@ -94,9 +96,18 @@ export class ResultScene extends Phaser.Scene {
       this.scene.start("PostOffice", { levelId });
     });
 
-    new Button(this, 800, 540, "返回选关", () => {
-      this.scene.start("LevelSelect");
+    new Button(this, 800, 540, "下一关", () => {
+      const nextLevel = LEVELS.find((l) => l.id === levelId + 1);
+      if (nextLevel) {
+        this.scene.start("PostOffice", { levelId: levelId + 1 });
+      } else {
+        this.scene.start("LevelSelect");
+      }
     });
+
+    new Button(this, 640, 620, "返回选关", () => {
+      this.scene.start("LevelSelect");
+    }, 160, 50);
   }
 
   private getTotalWeight(materialIds: string[]): number {

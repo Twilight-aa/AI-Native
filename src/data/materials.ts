@@ -56,3 +56,9 @@ export const TRAIT_FAIL_MESSAGES: Record<string, string> = {
   "怕光": "包裹因强光损坏",
   "需要透气": "包裹无法呼吸",
 };
+
+export const HAZARD_TRAIT_MAP: Record<string, string> = {
+  "雨": "怕水",
+  "颠簸": "易碎",
+  "强光": "怕光",
+};

@@ -1,7 +1,7 @@
 export interface LevelData {
   id: number;
   chapter: number;
-  timeLimit: number;
+  shiftDuration: number;
   orders: OrderData[];
   availableMaterials: string[];
   routes: RouteData[];
@@ -15,6 +15,8 @@ export interface OrderData {
   traits: string[];
   destination: string;
   deadline: number;
+  arrivalTime: number;
+  patience: number;
 }
 
 export interface RouteData {
@@ -29,24 +31,14 @@ export interface BirdData {
   name: string;
   speed: number;
   loadCapacity: number;
+  flyTime: number;
+  returnTime: number;
 }
 
 export interface StarConditions {
   safe: boolean;
   onTime: boolean;
   clever: boolean;
-}
-
-export interface PackingState {
-  container: string | null;
-  outer: string | null;
-  filling: string | null;
-  totalWeight: number;
-}
-
-export interface RouteSelection {
-  routeId: string;
-  birdId: string;
 }
 
 export interface MaterialData {
@@ -76,4 +68,35 @@ export interface DeliveryResult {
   clever: boolean;
   success: boolean;
   failReasons: string[];
+}
+
+export interface ShiftState {
+  time: number;
+  duration: number;
+  orders: ShiftOrderState[];
+  birds: ShiftBirdState[];
+  currentOrderIndex: number | null;
+  score: number;
+  combo: number;
+  satisfaction: number;
+  finished: boolean;
+}
+
+export interface ShiftOrderState {
+  order: OrderData;
+  arrived: boolean;
+  patienceRemaining: number;
+  status: "waiting" | "processing" | "in_transit" | "delivered" | "lost";
+  deliveryResult: DeliveryResult | null;
+  container: string | null;
+  outer: string | null;
+  filling: string | null;
+  selectedRoute: string | null;
+  selectedBird: string | null;
+}
+
+export interface ShiftBirdState {
+  birdId: string;
+  status: "idle" | "flying" | "returning";
+  timeRemaining: number;
 }

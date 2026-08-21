@@ -4,6 +4,7 @@ import { MenuScene } from "./scenes/MenuScene";
 import { LevelSelectScene } from "./scenes/LevelSelectScene";
 import { PostOfficeScene } from "./scenes/PostOfficeScene";
 import { RouteScene } from "./scenes/RouteScene";
+import { ShiftScene } from "./scenes/ShiftScene";
 import { ResultScene } from "./scenes/ResultScene";
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -16,7 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, LevelSelectScene, PostOfficeScene, RouteScene, ResultScene],
+  scene: [BootScene, MenuScene, LevelSelectScene, PostOfficeScene, RouteScene, ShiftScene, ResultScene],
 };
 
 new Phaser.Game(config);
